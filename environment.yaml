@@ -1,0 +1,10 @@
+name: stitching
+channels:
+- conda-forge
+- defaults
+dependencies:
+- numpy
+- opencv
+- pytorch
+- torchvision
+- tbb

@@ -1,0 +1,10 @@
+__pycache__
+.vscode
+*.pth
+*.mp4
+*.avi
+*.pt
+backup
+debug
+detailed
+.DS_Store
