@@ -1,0 +1,14 @@
+[project]
+name = "realtime-multicam-stitching"
+version = "0.1.0"
+description = "Real-time multi-camera stitching with optional detection, depth estimation, and tracking"
+requires-python = ">=3.9"
+dependencies = [
+    "numpy",
+    "opencv-python",
+    "torch",
+    "torchvision",
+    "tbb; sys_platform != 'darwin'",
+    "norfair",
+    "pillow",
+]

@@ -87,8 +87,7 @@ This algorithm is based on [the OpenCV Stitcher algorithm](https://docs.opencv.o
     ├── tracker.py   # Utility functions to run depth estimation & object tracking demo
     ├── depth.py     # Script to run depth estimation & object tracking demo
 
-    ├── environment.yaml    # Environment file (Recommended for Linux)
-    ├── requirements.txt    # Environment file (Recommended for Windows)
+    ├── pyproject.toml    # uv project file listing dependencies
     
     ├── img
     |    ├─── left.jpg
@@ -110,30 +109,12 @@ This algorithm is based on [the OpenCV Stitcher algorithm](https://docs.opencv.o
     .
 
 # Installation
-## Linux
-- Create a new environment using Anaconda:
+- Install [uv](https://docs.astral.sh/uv/), then sync dependencies:
 
-    ```conda env create -f environment.yaml```
-- Activate the environment:
+    ```uv sync```
+- Run any script with `uv run`, e.g.:
 
-    ```conda activate stitching```
-
-- To run depth.py, norfair is needed: 
-
-    ```pip install norfair```
-## Windows
-- Create a new environment using Anaconda:
-    
-    ```conda create -n [name]```
-- Activate the environment:
-
-    ```conda activate [name]```
-- Install necessary dependencies:
-
-    ```pip install -r requirements.txt```
-- Uninstall opencv-python-headless:
-
-    ```pip uninstall opencv-python-headless```
+    ```uv run python stitching_realtime_simple.py --sources 0,1,2```
 
 # Usage
 
