@@ -44,15 +44,6 @@ async def main():
     
     # Set up videoWriter
     videoWriter = None
-
-    # Set up DeltaX logo
-    deltax_img = cv2.imread('img/deltax.png')
-    pts = list()
-    h, w, _ = deltax_img.shape
-    for i in range(h):
-        for j in range(w):
-            if deltax_img[i][j][0] != 0 or deltax_img[i][j][1] != 0 or deltax_img[i][j][2] != 0:
-                pts.append((i, j))
                 
     print('Finish initialization!')
     
@@ -78,8 +69,6 @@ async def main():
                     cv2.imshow(msg[0], msg[1])
         retval, stitched = stitcher.stitch(frames)
         if retval:
-            for pt in pts:
-                stitched[pt[0], pt[1]] = deltax_img[pt[0], pt[1]]
             if save:
                 if videoWriter is None:# and retval:
                     w, h = stitched.shape[1], stitched.shape[0]

@@ -56,10 +56,15 @@ This algorithm is based on [the OpenCV Stitcher algorithm](https://docs.opencv.o
 
     ├── advanced    # Utility files for advanced stitching algorithm
     |      ├─── datasets.py           # Dataset generation class
-    |      ├─── matcher.py            # Matcher class 
     |      ├─── stitcher.py           # Stitcher class 
     ├── stitching_realtime_advanced.py   # Script to run real-time stiching using Stitcher's advanced algorithm
     ├── stitching_videos_advanced.py   # Script to run video stiching using advanced algorithm
+
+    ├── checkerboard_simple    # Utility files for checkerboard-corner-based stitching (experimental, see Usage section 5)
+    |      ├─── stitcher.py           # Stitcher class 
+    |      ├─── utils.py              # Checkerboard corner detector
+    ├── stitching_checkerboard.py   # Example script: stitch a single image triplet using checkerboard corners
+    ├── stitching_images_checkerboard_simple.py   # Example script: stitch a folder of image triplets using checkerboard corners
 
     ├── detect     # Utility files to run detection demo
     |      ├─── utils
@@ -179,7 +184,7 @@ Press Q on the keyboard to exit the stream.
 Run the script with the below command:
 
 ```
-python stitching_videos_advanced.py --sources [sources] --original [original] --output_path [output_path] --feature [feature] --thres [thres]
+python stitching_videos_advanced.py --sources [sources] --original [original] --output_path [output_path] --feature [feature] --thres [thres] --seam_choice [seam_choice] --wave_correct_choice [wave_correct_choice]
 ```
 where:
 
@@ -193,6 +198,8 @@ where:
     + 3: [ORB](https://ieeexplore.ieee.org/document/6126544) (default)
     + 4: [SIFT](https://link.springer.com/article/10.1023/B:VISI.0000029664.99615.94) 
 - **thres**: feature matching retention threshold. The default value is 0.3 for ORB and 0.65 for other feature types.
+- **seam_choice**: seam estimation type. The following types are supported: 0 - dp_color, 1 - dp_colorgrad, 2 - voronoi (default), 3 - no.
+- **wave_correct_choice**: wave effect correction type. The following types are supported: 0 - horizontal, 1 - none (default), 2 - vertical.
 
 example:
 
@@ -213,7 +220,7 @@ python stitching_realtime_simple.py --sources [sources] --original [original] --
 where:
 
 - **sources**: camera index list (on Windows it will be 0, 1, 2...., whereas on Linux it will be 0, 2, 4...)
-- **original**: show original video (True) or not (False). Default value is False.
+- **original**: show original video (True) or not (False). Default value is True. Passing `--original` turns the original-video display off.
 - **output_path**: where to save output. Default value is '' (no save output).
 - **feature**: a feature extractor method selection. The following methods are supported:
     + 0: [AKAZE](http://www.bmva.org/bmvc/2013/Papers/paper0013/paper0013.pdf)
@@ -233,7 +240,7 @@ where:
 example:
 
 ```
-python stitching_realtime_simple.py --sources 0,1,2 --original --save  --output_path stitching.mp4 --feature 4 --matching 1 --retention_thres 0.7 --reprojection_thres 4 --minimum_match_thres 10
+python stitching_realtime_simple.py --sources 0,1,2 --output_path stitching.mp4 --feature 4 --matching 1 --retention_thres 0.7 --reprojection_thres 4 --minimum_match_thres 10
 ```
 
 Press Q on the keyboard to exit the stream.
@@ -243,12 +250,13 @@ Press Q on the keyboard to exit the stream.
 Run the script with the below command:
 
 ```
-python stitching_realtime_advanced.py --sources [sources] --original [original] --output_path [output_path] --feature [feature] --thres [thres]
+python stitching_realtime_advanced.py --sources [sources] --original [original] --save [save] --output_path [output_path] --feature [feature] --thres [thres] --seam_choice [seam_choice] --wave_correct_choice [wave_correct_choice]
 ```
 where:
 
 - **sources**: camera index list (on Windows it will be 0, 1, 2...., whereas on Linux it will be 0, 2, 4...)
 - **original**: show original video (True) or not (False). Default value is False.
+- **save**: save output (True) or not (False). Default value is False.
 - **output_path**: where to save output. Default value is '' (no save output).
 - **feature**: a feature extractor method selection. The following methods are supported:
     + 0: [AKAZE](http://www.bmva.org/bmvc/2013/Papers/paper0013/paper0013.pdf)
@@ -257,6 +265,8 @@ where:
     + 3: [ORB](https://ieeexplore.ieee.org/document/6126544) (default)
     + 4: [SIFT](https://link.springer.com/article/10.1023/B:VISI.0000029664.99615.94) 
 - **thres**: feature matching retention threshold. The default value is 0.3 for ORB and 0.65 for other feature types.
+- **seam_choice**: seam estimation type. The following types are supported: 0 - dp_color, 1 - dp_colorgrad, 2 - voronoi (default), 3 - no.
+- **wave_correct_choice**: wave effect correction type. The following types are supported: 0 - horizontal, 1 - none (default), 2 - vertical.
 
 example:
 
@@ -270,30 +280,36 @@ Press Q on the keyboard to exit the stream.
 Run the script detect.py with the below command:
 
 ```
-python detect.py --sources [sources]  --device [device] --original [original] --output_path [output_path] --classes [classes] --cfg [cfg] --weights [weights] --names [names] --conf_thres [conf_thres] --iou_thres [iou_thres] --feature [feature] --thres [thres] 
+python detect.py --sources [sources]  --device [device] --original [original] --img_size [img_size] --output_path [output_path] --classes [classes] --agnostic_nms [agnostic_nms] --augment [augment] --cfg [cfg] --weights [weights] --names [names] --conf_thres [conf_thres] --iou_thres [iou_thres] --feature [feature] --thres [thres] --seam_choice [seam_choice] --wave_correct_choice [wave_correct_choice]
 ```
 where:
 
 - **sources**: list of camera indices and/or video file paths (on Windows the camera indices will be 0, 1, 2...., whereas on Linux it will be 0, 2, 4...)
 - **device**: cuda device, i.e. 0 or 0,1,2,3 or ''(cpu). Default is ''.
-- **original**: show original video (True) or not (False). Default is True.
-- **output_path**: where to save output. Default value is '' (no save output).
+- **original**: show original video (True) or not (False). Default is False.
+- **img_size**: inference size in pixels. Default is 416.
+- **output_path**: where to save output. Default value is 'result.mp4'.
 - **conf_thres**: object confidence threshold. Default is 0.4.
 - **iou_thres**: IOU threshold for NMS. Default is 0.5.
-- **classes**: filter by class: --class 0, or --class 0 2 3. Default all classes are inspected.
-- **cfg**: path to the .cfg file. Default is [detect\yolov7\yolov7-tiny.cfg](detect\yolov7\yolov7-tiny.cfg)
-- **weights**: path to the .weights file. Default is [detect\yolov7\yolov7-tiny.weights](detect\yolov7\yolov7-tiny.weights)
-- **names**: path to the .names file. Default is [detect\yolov7\coco.names](detect\yolov7\coco.names)
+- **classes**: filter by class: --classes 0, or --classes 0 2 3. Default all classes are inspected.
+- **agnostic_nms**: use class-agnostic NMS (True) or not (False). Default is False.
+- **augment**: use augmented inference (True) or not (False). Default is False.
+- **cfg**: path to the .cfg file. Default is [detect/yolov7/yolov7-tiny.cfg](detect/yolov7/yolov7-tiny.cfg)
+- **weights**: path to the .weights file. Default is [detect/yolov7/yolov7-tiny.weights](detect/yolov7/yolov7-tiny.weights)
+- **names**: path to the .names file. Default is [detect/yolov7/coco.names](detect/yolov7/coco.names)
 - **feature**: a feature extractor method selection. The following methods are supported:
     + 0: [AKAZE](http://www.bmva.org/bmvc/2013/Papers/paper0013/paper0013.pdf)
     + 1: [BRISK](https://margaritachli.com/papers/ICCV2011paper.pdf)
     + 2: [KAZE](https://www.doc.ic.ac.uk/~ajd/Publications/alcantarilla_etal_eccv2012.pdf)
     + 3: [ORB](https://ieeexplore.ieee.org/document/6126544)  (default)
     + 4: [SIFT](https://link.springer.com/article/10.1023/B:VISI.0000029664.99615.94)
+    + 5: SURF
 - **thres**: feature matching retention threshold. The default value is 0.3 for ORB and 0.65 for other feature types.
+- **seam_choice**: seam estimation type. The following types are supported: 0 - dp_color, 1 - dp_colorgrad, 2 - voronoi (default), 3 - no.
+- **wave_correct_choice**: wave effect correction type. The following types are supported: 0 - horizontal, 1 - none (default), 2 - vertical.
 Example:
 ```
-python detect.py --sources 0,1,2 --weights detect\yolov7\yolov7-tiny.weights --cfg detect\yolov7\yolov7-tiny.cfg --names detect\yolov7\coco.names --device 0 --original --output_path demo.mp4 --class 0 --conf_thres 0.4 --iou_thres 0.5 --feature 4 --thres 0.7
+python detect.py --sources 0,1,2 --weights detect/yolov7/yolov7-tiny.weights --cfg detect/yolov7/yolov7-tiny.cfg --names detect/yolov7/coco.names --device 0 --original --output_path demo.mp4 --classes 0 --conf_thres 0.4 --iou_thres 0.5 --feature 4 --thres 0.7
 ```
 
 Press Q on the keyboard to exit the stream.
@@ -303,27 +319,44 @@ Press Q on the keyboard to exit the stream.
 Run the script depth.py with the below command:
 
 ```
-python depth.py --sources [sources] --device [device] --original [original] --output_path [output_path] --model_type [model_type] --feature [feature] --thres [thres]
+python depth.py --sources [sources] --device [device] --original [original] --img_size [img_size] --output_path [output_path] --model_type [model_type] --feature [feature] --thres [thres] --seam_choice [seam_choice] --wave_correct_choice [wave_correct_choice]
 ```
 
 where:
 
 - **sources**: list of camera indices and/or video file paths (on Windows the camera indices will be 0, 1, 2...., whereas on Linux it will be 0, 2, 4...)
 - **device**: cuda device, i.e. 0 or 0,1,2,3 or cpu (''). Default is ''.
-- **original**: show original video (True) or not (False). Default is True.
-- **output_path**: where to save output. Default value is '' (no save output).
-- **model_type**: depth estimation model type: DPT_Large (default), DPT_Hybrid or MiDaS_small.
+- **original**: show original video (True) or not (False). Default is False.
+- **img_size**: inference size in pixels. Default is 640.
+- **output_path**: where to save output. Default value is 'result.mp4'.
+- **model_type**: depth estimation model type: DPT_Large, DPT_Hybrid or MiDaS_small (default).
 - **feature**: a feature extractor method selection. The following methods are supported:
     + 0: [AKAZE](http://www.bmva.org/bmvc/2013/Papers/paper0013/paper0013.pdf)
     + 1: [BRISK](https://margaritachli.com/papers/ICCV2011paper.pdf)
     + 2: [KAZE](https://www.doc.ic.ac.uk/~ajd/Publications/alcantarilla_etal_eccv2012.pdf)
     + 3: [ORB](https://ieeexplore.ieee.org/document/6126544)  (default)
     + 4: [SIFT](https://link.springer.com/article/10.1023/B:VISI.0000029664.99615.94)
+    + 5: SURF
 - **thres**: feature matching retention threshold. The default value is 0.3 for ORB and 0.65 for other feature types.
+- **seam_choice**: seam estimation type. The following types are supported: 0 - dp_color, 1 - dp_colorgrad, 2 - voronoi (default), 3 - no.
+- **wave_correct_choice**: wave effect correction type. The following types are supported: 0 - horizontal, 1 - none (default), 2 - vertical.
 
 Example:
 ```
-python depth.py --sources 0,1,2 --device 0 --original --save --output_path demo.mp4 --model_type MiDaS_small --feature 4 --thres 0.7
+python depth.py --sources 0,1,2 --device 0 --original --output_path demo.mp4 --model_type MiDaS_small --feature 4 --thres 0.7
 ```
 
 Press Q on the keyboard to exit the stream.
+
+## 5. Checkerboard-based stitching (experimental)
+
+`stitching_checkerboard.py` and `stitching_images_checkerboard_simple.py` use `checkerboard_simple.stitcher.Stitcher`, which estimates the homography from detected checkerboard corners instead of image keypoints. This is unlike every other script above.
+
+These two scripts are example/dev scripts, not parameterized CLI tools: they take no command-line arguments, and the input image paths are hardcoded inside the script and must be edited directly before running.
+
+- `stitching_checkerboard.py`: stitches a single hardcoded triplet of images (one from each of three fixed camera source folders).
+- `stitching_images_checkerboard_simple.py`: stitches every matching triplet found across those same three folders in a loop; press Q to stop early.
+
+`Stitcher(method=0, threshold=3)`:
+- **method**: homography computation method. 0 - least squares (default), 1 - RANSAC, 2 - LMEDS, 3 - RHO.
+- **threshold**: maximum allowed reprojection error to treat a point pair as an inlier (used by the RANSAC and RHO methods only). Default value is 3.

@@ -35,15 +35,6 @@ async def depth():
     
     # Set up videoWriter
     videoWriter = None
-
-    # Set up DeltaX logo
-    deltax_img = cv2.imread('img/deltax.png')
-    pts = list()
-    h, w, _ = deltax_img.shape
-    for i in range(h):
-        for j in range(w):
-            if deltax_img[i][j][0] != 0 or deltax_img[i][j][1] != 0 or deltax_img[i][j][2] != 0:
-                pts.append((i, j))
                 
     # w = -1
     # h = -1
@@ -173,10 +164,7 @@ async def depth():
                 cv2.line(img, (w // 2, h), (xCenter, yCenter), (242, 82, 2), 1)
                 
         view = np.vstack((img, depth_map))
-        
-        for pt in pts:
-            view[pt[0], pt[1]] = deltax_img[pt[0], pt[1]]
-        
+                
         cv2.imshow("Stitched", view)
         # if show:
         #     for j, img0 in enumerate(img0s):
