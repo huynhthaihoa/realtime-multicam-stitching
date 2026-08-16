@@ -48,7 +48,7 @@ This algorithm is based on [the OpenCV Stitcher algorithm](https://docs.opencv.o
 # Repository structure
     .
     ├── simple    # Utility files for simple stitching algorithm
-    |      ├─── datasets.py           # Dataset generation class
+    |      ├─── stream.py           # Utility classes related to input stream
     |      ├─── matcher.py            # Matcher class 
     |      ├─── stitcher.py           # Stitcher class 
     ├── stitching_realtime_simple.py   # Script to run real-time stiching using Stitcher's simple algorithm

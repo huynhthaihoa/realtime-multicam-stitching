@@ -7,7 +7,7 @@ import torch.backends.cudnn as cudnn
 from numpy import random
 
 from detect.utils.datasets import letterbox
-from advanced.datasets import StreamReader, Camera
+from advanced.stream import StreamReader, Camera
 from advanced.stitcher import Stitcher
 from detect.utils.general import (
     non_max_suppression, scale_coords, strip_optimizer)

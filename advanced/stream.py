@@ -10,7 +10,7 @@ from advanced.stitcher import Stitcher
 from typing import Any, List, Protocol
 
 class Stream(Protocol):
-  async def connect(self, parent_dir, camera_id) -> None:
+  async def connect(self, camera_id) -> None:
     ...
 
   async def disconnect(self) -> None:
@@ -26,14 +26,13 @@ class Camera:
     self.camera_id = camera_id    
     if camera_id.isnumeric():
       self.camera_name = f"camera {self.camera_id}"
-      self.stream = cv2.VideoCapture(eval(camera_id))
+      self.stream = cv2.VideoCapture(int(camera_id))
     else:
       self.camera_name = f"video {self.camera_id}"
       self.stream = cv2.VideoCapture(camera_id)
     print("Connecting", self.camera_name)
     if not self.stream.isOpened():
-      print("Error when opening", self.camera_name)
-      return    
+      raise RuntimeError(f"Failed to open {self.camera_name}")
   
   async def disconnect(self) -> None:
     print("Disconnecting", self.camera_name)
@@ -108,7 +107,6 @@ class StreamReader:
     # print("Setting the name of files for saving")
     return await asyncio.gather(*[self.streams[camera_name].set_recorder() for camera_name in cameras_name])
 
-
 class LoadStreams: # multiple IP or RTSP cameras
     def __init__(self, sources, featureExtractor, matchThres, seamChoice, waveCorrectChoice) -> None:
         # self.stitcher = cv2.Stitcher_create()
@@ -126,10 +124,10 @@ class LoadStreams: # multiple IP or RTSP cameras
     
     async def connect(self):
         self.connection = StreamReader()
-        cameras = [Camera()] * self.n_sources
+        cameras = [Camera() for _ in range(self.n_sources)]
         self.all_cameras = [self.connection.register_camera(cameras[i], self.sources[i]) for i in range(self.n_sources)]
-        asyncio.gather(*self.all_cameras)
-        await self.connection.set_recorder(self.sources)  
+        await asyncio.gather(*self.all_cameras)
+        await self.connection.set_recorder(self.sources)
         
     def __iter__(self):
       return self
@@ -158,9 +156,10 @@ class LoadStreams: # multiple IP or RTSP cameras
             if not success:
                 stitched = images[0]
                 ret = 1
-        except:
-            stitched = images[1]
-            ret = 2     
+        except Exception as e:
+            print("Stitching error:", e)
+            stitched = images[0]
+            ret = 2
         return ret, images, sources, stitched
         
     async def disconnect(self):

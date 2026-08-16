@@ -24,15 +24,15 @@ class Stitcher:
             where 'x' means refine respective parameter and '_' means don't refine,
             and has the following format:<fx><skew><ppx><aspect><ppy>.
             The default mask is 'xxxxx'.
-        warp_surface_type (str): warp surface type ('spherical', 'plane', 'cylindrical'...). The default is 'spherical'
+        warp_surface_type (str): warp surface type ('spherical', 'plane', 'cylindrical'...). The default is 'plane'
     """
-    def __init__(self, feature_type = 3, match_thres = -1, matcher_type = 0, conf_thres = 1.0, 
+    def __init__(self, feature_type = 3, match_thres = -1, matcher_type = 0, conf_thres = 1.0,
                  work_megapix = 0.6, seam_megapix = 0.1, seam_choice = 2, 
                  wave_correct_choice = 1, 
                  expose_comp_choice = 0, expos_comp_nr_feeds = 1, expos_comp_nr_filtering = 2.0, expos_comp_block_size = 32,
                  blend_choice = 0, blend_strength = 5, 
                  estimator = 0, ba = 0,
-                 ba_refine_mask ='xxxxxx', warp_surface_type = 'plane', try_use_gpu = True):
+                 ba_refine_mask ='xxxxx', warp_surface_type = 'plane', try_use_gpu = True):
         """Initialize Stitcher object
 
         Args:
@@ -56,8 +56,8 @@ class Stitcher:
                 where 'x' means refine respective parameter and '_' means don't refine,
                 and has the following format:<fx><skew><ppx><aspect><ppy>.
                 The default mask is 'xxxxx'.
-            warp_surface_type (str): warp surface type ('spherical', 'plane', 'cylindrical'...). The default is 'spherical'
-        """        
+            warp_surface_type (str): warp surface type ('spherical', 'plane', 'cylindrical'...). The default is 'plane'
+        """
         
         # feature extractor
         if feature_type == 3:
@@ -74,7 +74,7 @@ class Stitcher:
             else:
                 try:
                     self.extractor = cv2.xfeatures2d_SURF.create()
-                except:
+                except Exception:
                     print("SURF not available")
                     self.extractor = cv2.ORB.create()
                     feature_type = 3
@@ -334,7 +334,7 @@ class Stitcher:
             K[0, 2] *= seamWorkAspect
             K[1, 1] *= seamWorkAspect
             K[1, 2] *= seamWorkAspect
-            self.cacheSeamKs.append(K)
+            self.cacheSeamKs[i] = K
 
             self.cacheCameras[i].focal *= composeWorkAspect
             self.cacheCameras[i].ppx *= composeWorkAspect
@@ -490,6 +490,7 @@ class Stitcher:
             self.cacheWarpedMasks1 = [None] * self.imgNum
             self.cacheWarpedMasks2 = [None] * self.imgNum
             self.cacheCorners = [None] * self.imgNum
+            self.cacheSeamKs = [None] * self.imgNum
 
         # Phase 1: Image Registration
         if self.cacheCameras is None:# or self.imgNum != len(imgs): 

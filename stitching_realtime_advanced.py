@@ -2,7 +2,7 @@ import asyncio
 import cv2
 import argparse
 import time
-from advanced.datasets import StreamReader, Camera
+from advanced.stream import StreamReader, Camera
 from advanced.stitcher import Stitcher
 
 async def main():

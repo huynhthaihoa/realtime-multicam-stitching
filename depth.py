@@ -7,7 +7,7 @@ import torch
 import torch.backends.cudnn as cudnn
 
 # from advanced.datasets import LoadStreams
-from advanced.datasets import StreamReader, Camera
+from advanced.stream import StreamReader, Camera
 from advanced.stitcher import Stitcher
 
 from tracker import *
